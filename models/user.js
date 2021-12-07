@@ -28,6 +28,7 @@ const validate = (data, forCreation = true) => {
     lastname: Joi.string().max(255).presence(presence),
     city: Joi.string().allow(null, '').max(255),
     language: Joi.string().allow(null, '').max(255),
+    password: Joi.string().min(8),
   }).validate(data, { abortEarly: false }).error;
 };
 
@@ -61,9 +62,20 @@ const findByEmailWithDifferentId = (email, id) => {
 };
 
 const create = (data) => {
-  return db.query('INSERT INTO users SET ?', data).then(([result]) => {
-    const id = result.insertId;
-    return { ...data, id };
+  hashPassword(data.password).then((hashedPassword) => {
+    const newUser = {
+      firstname: data.firstname,
+      lastname: data.lastname,
+      email: data.email,
+      city: data.city,
+      language: data.language,
+      hashedPassword: hashedPassword
+    };
+    console.log(data.password + ' - ' + hashPassword(data.password));
+    return db.query('INSERT INTO users SET ?', newUser).then(([result]) => {
+      const id = result.insertId;
+      return { ...newUser, id };
+    });
   });
 };
 

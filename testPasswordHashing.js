@@ -6,3 +6,7 @@ User.verifyPassword(
 ).then((passwordIsCorrect) => {
   console.log(passwordIsCorrect);
 });
+
+User.hashPassword('myPlainPassword').then((hashedPassword) => {
+  console.log(hashedPassword);
+});
