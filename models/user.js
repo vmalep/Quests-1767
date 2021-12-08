@@ -2,6 +2,7 @@ const connection = require('../db-config');
 const Joi = require('joi');
 
 const argon2 = require('argon2');
+const { calculateToken } = require('../helpers/users');
 
 const hashingOptions = {
   type: argon2.argon2id,
@@ -61,21 +62,23 @@ const findByEmailWithDifferentId = (email, id) => {
     .then(([results]) => results[0]);
 };
 
-const create = (data) => {
-  hashPassword(data.password).then((hashedPassword) => {
-    const newUser = {
-      firstname: data.firstname,
-      lastname: data.lastname,
-      email: data.email,
-      city: data.city,
-      language: data.language,
-      hashedPassword: hashedPassword
-    };
-    console.log(data.password + ' - ' + hashPassword(data.password));
-    return db.query('INSERT INTO users SET ?', newUser).then(([result]) => {
-      const id = result.insertId;
-      return { ...newUser, id };
-    });
+const create = async (data) => {
+  const hashedPassword = await hashPassword(data.password);
+  const token = await calculateToken(data.email);
+  
+  const newUser = {
+    firstname: data.firstname,
+    lastname: data.lastname,
+    email: data.email,
+    city: data.city,
+    language: data.language,
+    hashedPassword: hashedPassword,
+    token: token,
+  };
+  console.log(data.password + ' - ' + hashPassword(data.password));
+  return db.query('INSERT INTO users SET ?', newUser).then(([result]) => {
+    const id = result.insertId;
+    return { ...newUser, id };
   });
 };
 
