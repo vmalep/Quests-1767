@@ -33,7 +33,7 @@ const validate = (data, forCreation = true) => {
 };
 
 const findMany = ({ filters: { language } }) => {
-  let sql = 'SELECT * FROM users';
+  let sql = 'SELECT id, firstname, lastname, city, language FROM users';
   const sqlValues = [];
   if (language) {
     sql += ' WHERE language = ?';
@@ -45,13 +45,13 @@ const findMany = ({ filters: { language } }) => {
 
 const findOne = (id) => {
   return db
-    .query('SELECT * FROM users WHERE id = ?', [id])
+    .query('SELECT id, firstname, lastname, city, language  FROM users WHERE id = ?', [id])
     .then(([results]) => results[0]);
 };
 
 const findByEmail = (email) => {
   return db
-    .query('SELECT * FROM users WHERE email = ?', [email])
+    .query('SELECT email, hashedPassword FROM users WHERE email = ?', [email])
     .then(([results]) => results[0]);
 };
 
