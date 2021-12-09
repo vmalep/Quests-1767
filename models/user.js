@@ -62,6 +62,12 @@ const findEmailById = (id) => {
     .then(([results]) => results[0]);
 };
 
+const findUser = (toSelect, whereField, findValue) => {
+  return db
+    .query('SELECT ? FROM users WHERE ? = ?', [toSelect, whereField, findValue])
+    .then(([results]) => results[0]);
+};
+
 const findByEmailWithDifferentId = (email, id) => {
   return db
     .query('SELECT * FROM users WHERE email = ? AND id <> ?', [email, id])
@@ -81,7 +87,6 @@ const create = async (data) => {
     hashedPassword: hashedPassword,
     token: token,
   };
-  console.log(data.password + ' - ' + hashPassword(data.password));
   return db.query('INSERT INTO users SET ?', newUser).then(([result]) => {
     const id = result.insertId;
     return { ...newUser, id };
@@ -92,7 +97,6 @@ const update = async (id, newAttributes) => {
   const email = await findEmailById(id);
   const token = await calculateToken(email);
   newAttributes = {...newAttributes, token};
-  console.log(newAttributes);
   return db.query('UPDATE users SET ? WHERE id = ?', [newAttributes, id]);
 };
 
@@ -111,6 +115,8 @@ module.exports = {
   destroy,
   findByEmail,
   findByEmailWithDifferentId,
+  findEmailById,
+  findUser,
   hashPassword,
   verifyPassword,
 };

@@ -39,6 +39,7 @@ moviesRouter.get('/:id', (req, res) => {
 });
 
 moviesRouter.post('/', (req, res) => {
+  const token = req.cookies.user_token;
   const error = Movie.validate(req.body);
   if (error) {
     res.status(422).json({ validationErrors: error.details });
