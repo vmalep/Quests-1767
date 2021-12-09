@@ -2,16 +2,23 @@ const moviesRouter = require('express').Router();
 const Movie = require('../models/movie');
 const User = require('../models/user');
 
-moviesRouter.get('/', (req, res) => {
-  const { max_duration, color } = req.query;
-  Movie.findMany({ filters: { max_duration, color } })
-    .then((movies) => {
-      res.json(movies);
-    })
-    .catch((err) => {
-      console.log(err);
-      res.status(500).send('Error retrieving movies from database');
-    });
+moviesRouter.get('/', async (req, res) => {
+  const token = req.cookies.user_token;
+  try{
+    const user_id = await User.findIdByToken(token);
+    const { max_duration, color } = req.query;
+    Movie.findMany({ filters: { user_id, max_duration, color } })
+      .then((movies) => {
+        res.json(movies);
+      })
+      .catch((err) => {
+        console.log(err);
+        res.status(500).send('Error retrieving movies from database');
+      });
+  } catch(error){
+    console.log(error);
+    res.status(401).send('User not found');
+  }
 });
 
 moviesRouter.get('/:id', (req, res) => {
@@ -31,14 +38,14 @@ moviesRouter.get('/:id', (req, res) => {
 moviesRouter.post('/', async (req, res) => {
   const token = req.cookies.user_token;
   try{
-    const userId = await User.findIdByToken(token);
-    const error = Movie.validate({...req.body, user_id: userId});
+    const user_id = await User.findIdByToken(token);
+    const error = Movie.validate({...req.body, user_id});
     if (error) {
       console.log(error);
       res.status(422).json({ validationErrors: error.details });
     } else {
       console.log('validaded');
-      Movie.create({...req.body, user_id: userId})
+      Movie.create({...req.body, user_id})
         .then((createdMovie) => {
           res.status(201).json(createdMovie);
         })

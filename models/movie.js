@@ -16,9 +16,9 @@ const validate = (data, forCreation = true) => {
   }).validate(data, { abortEarly: false }).error;
 };
 
-const findMany = ({ filters: { color, max_duration } }) => {
-  let sql = 'SELECT * FROM movies';
-  const sqlValues = [];
+const findMany = ({ filters: { user_id, color, max_duration } }) => {
+  let sql = 'SELECT * FROM movies WHERE user_id = ?';
+  const sqlValues = [user_id];
 
   if (color) {
     sql += ' WHERE color = ?';
