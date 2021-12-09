@@ -62,11 +62,20 @@ const findEmailById = (id) => {
     .then(([results]) => results[0]);
 };
 
-const findUser = (toSelect, whereField, findValue) => {
+const findIdByToken = (token) => {
+  return db
+    .query('SELECT id FROM users WHERE token = ?', [token])
+    .then(([results]) => results[0].id);
+};
+
+// not working (return undefined)
+/* const findUser = (toSelect, whereField, findValue) => {
+  const sql = `SELECT ${toSelect} FROM users WHERE ${whereField} = '${findValue}'`;
+  console.log('sql: ' + sql);
   return db
     .query('SELECT ? FROM users WHERE ? = ?', [toSelect, whereField, findValue])
     .then(([results]) => results[0]);
-};
+}; */
 
 const findByEmailWithDifferentId = (email, id) => {
   return db
@@ -116,7 +125,8 @@ module.exports = {
   findByEmail,
   findByEmailWithDifferentId,
   findEmailById,
-  findUser,
+  findIdByToken,
+  //findUser,
   hashPassword,
   verifyPassword,
 };
