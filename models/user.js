@@ -58,7 +58,7 @@ const findByEmail = (email) => {
 
 const findEmailById = (id) => {
   return db
-    .query('SELECT email FROM users WHERE id = ?', [email])
+    .query('SELECT email FROM users WHERE id = ?', [id])
     .then(([results]) => results[0]);
 };
 
@@ -91,6 +91,7 @@ const create = async (data) => {
 const update = async (id, newAttributes) => {
   const email = await findEmailById(id);
   const token = await calculateToken(email);
+  newAttributes = {...newAttributes, token};
   console.log(newAttributes);
   return db.query('UPDATE users SET ? WHERE id = ?', [newAttributes, id]);
 };
